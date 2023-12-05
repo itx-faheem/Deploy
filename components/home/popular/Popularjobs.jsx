@@ -4,14 +4,22 @@ import popularjobsStyles from './popularjobs.style';
 import { COLORS, FONT, SIZES } from '../../../constants';
 import PopularJobCard from '../../common/cards/popular/PopularJobCard';
 import useFetch from '../../../hook/useFetch';
+import { useNavigation } from "@react-navigation/native";  
 
 const Popularjobs = () => {
-  const { data, isLoading, error } = useFetch
-  ('search', {
-    query: 'react developer',
-    num_pages: 1,
+  const { data, isLoading, error } = useFetch("search", {
+    query: "React developer",
+    num_pages: "1",
   });
-  console.log(data,"data1");
+
+  const [selectedJob, setSelectedJob] = useState();
+  const handleCardPress = (item) => {
+    const navigation = useNavigation();  
+    navigation.push(`/job-details/${item.job_id}`);
+    setSelectedJob(item.job_id);
+  };
+
+
 
   return (
     <View style={popularjobsStyles.container}>
@@ -23,21 +31,23 @@ const Popularjobs = () => {
       </View>
       <View style={popularjobsStyles.cardsContainer}>
         {isLoading ? (
-          <ActivityIndicator size="large" color={COLORS.primary} />
+          <ActivityIndicator size='large' color={COLORS.primary} />
         ) : error ? (
           <Text>Something went wrong</Text>
         ) : (
           <FlatList
-            data={[1,2,3,]}
-            renderItem={({ item }) => {
-              return <PopularJobCard item={item} />;
-            }}
-            keyExtractor={(item) => item?.job_id}
-            contentContainerStyle={{ paddingHorizontal: SIZES.medium }} 
+            data={data}
+            renderItem={({ item }) => (
+              <PopularJobCard
+                item={item}
+                selectedJob={selectedJob}
+                handleCardPress={handleCardPress}
+              />
+            )}
+            keyExtractor={(item) => item.job_id}
+            contentContainerStyle={{ columnGap: SIZES.medium }}
             horizontal
-            showsHorizontalScrollIndicator={false}
           />
-  
         )}
       </View>
     </View>
@@ -45,3 +55,8 @@ const Popularjobs = () => {
 };
 
 export default Popularjobs;
+
+
+
+
+
